@@ -237,6 +237,27 @@ def decrement_counter(key: str, val: int = 1) -> int:
     # Numeric values are returned as decimal.Decimal
     return response["Attributes"][_COUNT_COL].to_integral_value()
 
+def set_counter(key: str, val: int) -> int:
+    """Set a counter in the table to a user defined value.
+    
+    Args:
+        key: The name of the counter (need not exist yet)
+        val: The new value of the counter
+        
+    Returns:
+        The new value of the count
+    """
+    response = kv_table().update_item(
+        Key={"key": key},
+        ReturnValues="UPDATED_NEW",
+        UpdateExpression="SET #col = :val",
+        ExpressionAttributeNames={"#col": _COUNT_COL},
+        ExpressionAttributeValues={":val": val},
+    )
+    
+    # Numeric values are returned as decimal.Decimal
+    return response["Attributes"][_COUNT_COL].to_integral_value()
+
 
 def reset_counter(key: str) -> None:
     """Reset a counter to 0."""
